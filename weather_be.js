@@ -10,7 +10,9 @@ function kelvinToCelsiusFahrenheit(kelvin) {
 }
 
 const BASE_URL = "http://api.openweathermap.org/data/2.5/weather?";
-const API_KEY = "";
+
+require('dotenv').config();
+const API_KEY = process.env.API_KEY;
 const CITY = "TOKYO";
 
 
@@ -22,10 +24,19 @@ const url = `${BASE_URL}appid=${API_KEY}&q=${CITY}`;
 /* The `fetch` function returns a promise that resolves to the reponse object representing the HTTP response.*/
 fetch(url)
     .then(response => response.json())  // First .then() handles the raw HTTP response and parses it as JSON
+  
     .then(data => {  // Second .then() handles the parsed JSON data
+        /* Use to review data
+        console.log(data);
+        */
         const temp_kelvin = data.main.temp;
         const [temp_celsius, temp_fahrenheit] = kelvinToCelsiusFahrenheit(temp_kelvin);
-        console.log(`Celsius: ${temp_celsius}, Fahrenheit: ${temp_fahrenheit}`);
+        const weatherDescription = data.weather[0].description;
+        const roundedCelsius = Math.round(temp_celsius);
+        const roundedFahrenheit = Math.round(temp_fahrenheit);
+
+        console.log(`It looks like the weather in ${CITY} is ${weatherDescription}`);
+        console.log(`Celsius: ${roundedCelsius}, Fahrenheit: ${roundedFahrenheit}`);
     })
     .catch(error => {
         console.error('Error:', error);
