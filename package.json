@@ -1,0 +1,23 @@
+{
+  "name": "weather_websiteandapi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "weather_be.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KarakuriKaiju/Weather_WebsiteAndAPI.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KarakuriKaiju/Weather_WebsiteAndAPI/issues"
+  },
+  "homepage": "https://github.com/KarakuriKaiju/Weather_WebsiteAndAPI#readme",
+  "dependencies": {
+    "node-fetch": "^2.7.0"
+  }
+}
