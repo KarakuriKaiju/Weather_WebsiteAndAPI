@@ -1,43 +1,52 @@
-/*This line imports the `node-fetch` library, which is a module that allows us to make HTTP requests in a NODE.JS environment.
-`require('node-fetch')` loads the module and assigns it to the `fetch` constant. */
+const express = require('express');
 const fetch = require('node-fetch');
+require('dotenv').config();
 
-// the function to convert Kelvin to Celsius and Fahrenheit
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+const BASE_URL = "http://api.openweathermap.org/data/2.5/weather?";
+const API_KEY = process.env.API_KEY;
+
+// Function to convert Kelvin to Celsius and Fahrenheit
 function kelvinToCelsiusFahrenheit(kelvin) {
     const celsius = kelvin - 273.15;
     const fahrenheit = celsius * (9 / 5) + 32;
     return [celsius, fahrenheit];
 }
 
-const BASE_URL = "http://api.openweathermap.org/data/2.5/weather?";
+// Endpoint to get weather data for a specified city
+app.get('/weather/:city', async (req, res) => {
+    const city = req.params.city;
+    const url = `${BASE_URL}appid=${API_KEY}&q=${city}`;
 
-require('dotenv').config();
-const API_KEY = process.env.API_KEY;
-const CITY = "TOKYO";
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
 
+        if (data.cod !== 200) {
+            return res.status(data.cod).json({ error: data.message });
+        }
 
-/*Constructing the full URL with a way to change the `CITY` input value.
-The backticks (```) denote a template literal, which allows you to embed variables directly within a string. */
-const url = `${BASE_URL}appid=${API_KEY}&q=${CITY}`;
-
-
-/* The `fetch` function returns a promise that resolves to the reponse object representing the HTTP response.*/
-fetch(url)
-    .then(response => response.json())  // First .then() handles the raw HTTP response and parses it as JSON
-  
-    .then(data => {  // Second .then() handles the parsed JSON data
-        /* Use to review data
-        console.log(data);
-        */
         const temp_kelvin = data.main.temp;
         const [temp_celsius, temp_fahrenheit] = kelvinToCelsiusFahrenheit(temp_kelvin);
         const weatherDescription = data.weather[0].description;
         const roundedCelsius = Math.round(temp_celsius);
         const roundedFahrenheit = Math.round(temp_fahrenheit);
 
-        console.log(`It looks like the weather in ${CITY} is ${weatherDescription}`);
-        console.log(`Celsius: ${roundedCelsius}, Fahrenheit: ${roundedFahrenheit}`);
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
+        res.json({
+            city: city,
+            weatherDescription: weatherDescription,
+            temperature: {
+                celsius: roundedCelsius,
+                fahrenheit: roundedFahrenheit
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Error fetching weather data' });
+    }
+});
+
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
